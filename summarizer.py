@@ -2,7 +2,13 @@ import argparse
 import subprocess
 import os
 import sys
-from openai import OpenAI
+
+try:
+    from openai import OpenAI
+except ImportError:
+    print("Error: The 'openai' Python package is not installed.")
+    print("Please install it using: pip install openai")
+    sys.exit(1)
 
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -93,8 +99,6 @@ def main():
         print("No commits found between specified tags/commits.")
         return
 
-    # Truncate commits and files to fit within max_chars
-    # Allocate 60% of max_chars to commits and 40% to files
     max_commits_chars = int(args.max_chars * 0.6)
     max_files_chars = int(args.max_chars * 0.4)
 
@@ -107,8 +111,7 @@ def main():
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         print("Error: OPENAI_API_KEY environment variable is not set.")
-        print(f"Commits (Truncated):\n{truncated_commits}")
-        print(f"Files (Truncated):\n{truncated_files}")
+        print("Please set it using: export OPENAI_API_KEY='your-key'")
         sys.exit(1)
 
     client = OpenAI(api_key=api_key)

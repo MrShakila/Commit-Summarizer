@@ -21,14 +21,17 @@ A Python CLI tool that summarizes git commits between two tags (or references) a
 
 ## Installation
 
-1. Install the required dependencies:
-   ```bash
-   pip install openai
-   ```
-2. Set your OpenAI API key:
-   ```bash
-   export OPENAI_API_KEY='your-api-key-here'
-   ```
+### 1. Install Dependencies
+The tool requires the `openai` Python package. You must install it in your Python environment:
+```bash
+pip install openai
+```
+*Note: If you are using a virtual environment, ensure it is activated before installing.*
+
+### 2. Set OpenAI API Key
+```bash
+export OPENAI_API_KEY='your-api-key-here'
+```
 
 ## Usage
 
@@ -48,6 +51,7 @@ Navigate to the root of your other project and run:
 ```bash
 python3 /path/to/summarizer.py [new_tag] [old_tag]
 ```
+**Important:** Ensure that the environment where you run the command has the `openai` package installed.
 
 ## Output
 
