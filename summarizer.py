@@ -51,10 +51,22 @@ def resolve_tags(args_new, args_old):
 
     return old_tag, new_tag
 
+def truncate_text(text, max_chars, side="bottom"):
+    if not text:
+        return ""
+    if len(text) <= max_chars:
+        return text
+
+    if side == "bottom":
+        return text[:max_chars] + f"\n... [Truncated, total length: {len(text)} chars]"
+    else:
+        return f"[Truncated, total length: {len(text)} chars] ...\n" + text[-max_chars:]
+
 def main():
     parser = argparse.ArgumentParser(description="Summarize git commits between tags and identify QA tasks.")
     parser.add_argument("new_tag", nargs='?', help="The new tag (default: latest tag)")
     parser.add_argument("old_tag", nargs='?', help="The old tag (default: tag before new_tag)")
+    parser.add_argument("--max-chars", type=int, default=60000, help="Maximum characters for the prompt to avoid API limits (default: 60000)")
 
     args = parser.parse_args()
 
@@ -81,12 +93,22 @@ def main():
         print("No commits found between specified tags/commits.")
         return
 
+    # Truncate commits and files to fit within max_chars
+    # Allocate 60% of max_chars to commits and 40% to files
+    max_commits_chars = int(args.max_chars * 0.6)
+    max_files_chars = int(args.max_chars * 0.4)
+
+    truncated_commits = truncate_text(commits, max_commits_chars)
+    truncated_files = truncate_text(files, max_files_chars)
+
+    if len(commits) > max_commits_chars or (files and len(files) > max_files_chars):
+        print(f"Warning: Input data exceeded character limit and was truncated to fit OpenAI API constraints.")
+
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         print("Error: OPENAI_API_KEY environment variable is not set.")
-        # In a real scenario we'd exit, but for testing purposes we might want to see the gathered data
-        print(f"Commits:\n{commits}")
-        print(f"Files:\n{files}")
+        print(f"Commits (Truncated):\n{truncated_commits}")
+        print(f"Files (Truncated):\n{truncated_files}")
         sys.exit(1)
 
     client = OpenAI(api_key=api_key)
@@ -96,10 +118,10 @@ Summarize the following git commits and identify what should be checked during Q
 Return the output in Markdown format.
 
 Commits:
-{commits}
+{truncated_commits}
 
 Changed Files:
-{files}
+{truncated_files}
 
 The output should have two sections:
 1. Commit Summary: A concise summary of the changes.
@@ -123,7 +145,10 @@ The output should have two sections:
         print("Summary and QA recommendations written to what_to_qa.md")
 
     except Exception as e:
-        print(f"Error calling OpenAI API: {e}")
+        if "rate_limit_exceeded" in str(e):
+            print(f"Error: OpenAI API Rate Limit Exceeded. Try reducing --max-chars. Full error: {e}")
+        else:
+            print(f"Error calling OpenAI API: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

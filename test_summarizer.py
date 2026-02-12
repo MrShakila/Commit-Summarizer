@@ -28,7 +28,6 @@ class TestSummarizer(unittest.TestCase):
         subprocess.run(f"git add {filename}", shell=True, capture_output=True)
         subprocess.run(f'git commit -m "{message}"', shell=True, capture_output=True)
         if tag:
-            # Sleep to ensure different creatordate
             time.sleep(1.1)
             subprocess.run(f"git tag {tag}", shell=True, capture_output=True)
 
@@ -44,20 +43,16 @@ class TestSummarizer(unittest.TestCase):
         self.create_commit("file2.txt", "v2", "Second commit", tag="v2.0")
 
         tags = summarizer.get_tags()
-        # Ensure v2.0 is first in tags list because it's newer
         self.assertEqual(tags[0], "v2.0")
 
-        # Default: should pick v2.0 and v1.0
         old, new = summarizer.resolve_tags(None, None)
         self.assertEqual(new, "v2.0")
         self.assertEqual(old, "v1.0")
 
-        # One arg: v2.0 -> should pick v2.0 and v1.0
         old, new = summarizer.resolve_tags("v2.0", None)
         self.assertEqual(new, "v2.0")
         self.assertEqual(old, "v1.0")
 
-        # One arg: v1.0 -> should pick v1.0 and first commit
         old, new = summarizer.resolve_tags("v1.0", None)
         self.assertEqual(new, "v1.0")
         self.assertEqual(old, summarizer.get_first_commit())
@@ -72,6 +67,13 @@ class TestSummarizer(unittest.TestCase):
 
         files = summarizer.get_changed_files("v1.0", "v2.0")
         self.assertEqual(files, "file2.txt")
+
+    def test_truncate_text(self):
+        text = "a" * 100
+        truncated = summarizer.truncate_text(text, 50)
+        self.assertTrue(len(truncated) > 50)
+        self.assertTrue(truncated.startswith("a" * 50))
+        self.assertIn("Truncated", truncated)
 
 if __name__ == "__main__":
     unittest.main()
