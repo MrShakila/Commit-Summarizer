@@ -1,0 +1,9 @@
+README.md
+setup.py
+summarizer.py
+git_qa_summarizer.egg-info/PKG-INFO
+git_qa_summarizer.egg-info/SOURCES.txt
+git_qa_summarizer.egg-info/dependency_links.txt
+git_qa_summarizer.egg-info/entry_points.txt
+git_qa_summarizer.egg-info/requires.txt
+git_qa_summarizer.egg-info/top_level.txt

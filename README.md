@@ -11,47 +11,63 @@ A Python CLI tool that summarizes git commits between two tags (or references) a
   - One argument (`new_tag`): Compares the specified tag against the one immediately preceding it.
   - Two arguments (`new_tag`, `old_tag`): Compares the range between the two specified tags.
 - **Token Management**: Automatically truncates input if it's too large to fit within OpenAI's rate limits.
-- **Customizable Limits**: Use the `--max-chars` flag to adjust the amount of data sent to the API.
 
-## Prerequisites
+## Global Installation (Recommended)
 
-- Python 3.x
-- Git
-- An OpenAI API Key (`OPENAI_API_KEY` environment variable)
+To use the `git-qa` command from anywhere on your system:
 
-## Installation
+1. Clone this repository.
+2. Navigate to the repository root.
+3. Install the package globally:
+   ```bash
+   pip install .
+   ```
+   *(Note: Use `pip install --break-system-packages .` if you are on a recent macOS/Linux and not using a virtual environment, or simply install it within your preferred global python environment.)*
 
-### 1. Install Dependencies
-The tool requires the `openai` Python package. You must install it in your Python environment:
-```bash
-pip install openai
-```
-*Note: If you are using a virtual environment, ensure it is activated before installing.*
+4. Set your OpenAI API key in your shell profile (`.bashrc`, `.zshrc`, etc.):
+   ```bash
+   export OPENAI_API_KEY='your-api-key-here'
+   ```
 
-### 2. Set OpenAI API Key
-```bash
-export OPENAI_API_KEY='your-api-key-here'
-```
+Now you can run `git-qa` in any Git repository!
 
-## Usage
+## Alternative Usage
 
-### Basic usage
-```bash
-python3 summarizer.py [new_tag] [old_tag]
-```
-
-### Handling large diffs
-If you encounter "Rate Limit Exceeded" errors, you can reduce the amount of data sent:
-```bash
-python3 summarizer.py --max-chars 20000
-```
-
-### In a different Git project
-Navigate to the root of your other project and run:
+### Run without installation
+If you don't want to install it globally, you can run it directly:
 ```bash
 python3 /path/to/summarizer.py [new_tag] [old_tag]
 ```
-**Important:** Ensure that the environment where you run the command has the `openai` package installed.
+
+### Using a Shell Alias
+Add this to your shell profile:
+```bash
+alias git-qa='python3 /absolute/path/to/summarizer.py'
+```
+
+## Usage Examples
+
+Inside any Git repository:
+
+### 1. Compare the latest two tags
+```bash
+git-qa
+```
+
+### 2. Compare a specific tag against its predecessor
+```bash
+git-qa v2.0
+```
+
+### 3. Compare two specific tags or hashes
+```bash
+git-qa v2.0 v1.0
+```
+
+### 4. Adjust character limits for large diffs
+```bash
+git-qa --max-chars 20000
+```
 
 ## Output
 
