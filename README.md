@@ -16,44 +16,49 @@ A Python CLI tool that summarizes git commits between two tags (or references) a
 
 - Python 3.x
 - Git
-- An OpenAI API Key
+- An OpenAI API Key (`OPENAI_API_KEY` environment variable)
 
 ## Installation
 
-1. Clone the repository (if not already done).
-2. Install the required dependencies:
+1. Install the required dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install openai
    ```
-3. Set your OpenAI API key as an environment variable:
+2. Set your OpenAI API key:
    ```bash
    export OPENAI_API_KEY='your-api-key-here'
    ```
 
 ## Usage
 
-Run the script from the root of your git repository:
-
-### 1. Compare the latest two tags
+### In this repository
+Run the script from the root:
 ```bash
-python3 summarizer.py
+python3 summarizer.py [new_tag] [old_tag]
 ```
 
-### 2. Compare a specific tag against its predecessor
+### In a different Git project
+You can use this tool in any Git repository by following these steps:
+
+#### Option 1: Run by providing the path
+Navigate to the root of your other project and run:
 ```bash
-python3 summarizer.py v2.0
+python3 /path/to/summarizer.py [new_tag] [old_tag]
 ```
 
-### 3. Compare two specific tags or hashes
+#### Option 2: Copy the script
+Simply copy `summarizer.py` to the root of your other project and run it there.
+
+#### Option 3: Global Alias
+Add an alias to your `.bashrc` or `.zshrc`:
 ```bash
-python3 summarizer.py v2.0 v1.0
+alias git-qa='python3 /absolute/path/to/summarizer.py'
 ```
+Then you can just run `git-qa` inside any git repo.
 
 ## Output
 
-The tool generates a file named `what_to_qa.md` in the current directory, containing:
-1. **Commit Summary**: A high-level overview of the changes.
-2. **QA Recommendations**: A list of specific test scenarios and areas of focus.
+The tool generates a file named `what_to_qa.md` in the directory where it is executed.
 
 ## Running Tests
 
